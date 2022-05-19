@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package fintracker.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "internal/fintracker";
+
+// User describes a user in the system.
+message User {
+    // ID is the unique identifier of this user.
+    string id = 1;
+
+    // Name is the nick name of the user.
+    string name = 2;
+}
+
+// Transaction describes a financial transaction.
+message Transaction {
+    // The unique identifier of this transaction.
+    string id = 1;
+
+    // The user that reported this transaction.
+    User reported_by = 2;
+    
+    // The time this transaction was reported on.
+    google.protobuf.Timestamp reported_on = 3;
+
+    // The time this transaction was made.
+    google.protobuf.Timestamp created_on = 4;
+
+    // The deduction in this transacion, a positive value means a deduction, a negative number means a gain.
+    float amount = 5;
+
+    // Series of tags to attribute this transacion to.
+    repeated string tags = 6;
+
+    // Extra details and notes for this transaction.
+    string notes = 7;
+}
+
+// Request to create a new transaction.
+message AddTransactionRequest {
+    // The user that reported this transaction.
+    User reported_by = 1;
+    
+    // The time this transaction was reported on.
+    google.protobuf.Timestamp reported_on = 2;
+
+    // The deduction in this transacion, a positive value means a deduction, a negative number means a gain.
+    float amount = 4;
+
+    // Series of tags to attribute this transacion to.
+    repeated string tags = 5;
+
+    // Extra details and notes for this transaction.
+    string notes = 6;
+}
+
+message AddTransactionResponse {
+    string id = 1;
+}
+
+message FetchTransactionRequest {
+    string id = 1;
+}
+
+message FetchTransactionResponse {
+    Transaction transaction = 1;
+}
+
+// TransactionService provides functionality to create, list and get transactions.
+service TransactionService {
+
+    // AddTransaction adds a new transaction.
+    rpc AddTransaction(AddTransactionRequest) returns (AddTransactionResponse);
+
+    // FetchTransaction fetches a transaction.
+    rpc FetchTransaction(FetchTransactionRequest) returns (FetchTransactionResponse);
+}
